@@ -6,6 +6,9 @@
  * Additionally, files are saved in directories, corresponding to the page that is currently being edited.
  * 
  * In order for this to work out-of the box, the following extensions need to be configured:
+ *
+ *
+ * For Pages:
  * 
  * SiteTree:
  *   extensions:
@@ -14,6 +17,16 @@
  * LeftAndMain:
  *   extensions:
  *    - UploadDirRules_LeftAndMainExtension 
+ *
+ *
+ * For DataObjects
+ *
+ * static $extensions = array(
+ * 	'AssetsFolderExtension',
+ * 	'UploadDirRules_DataObjectExtension'
+ * );
+ *
+ * 
  * 
  * 
  * @author Anselm Christophersen <ac@title.dk>
@@ -95,8 +108,19 @@ class UploadDirRules {
 }
 
 
+/**
+ * This is for dataobjects
+ */
+class UploadDirRules_DataObjectExtension extends DataExtension {
+
+}
+
+
+
 
 /**
+ * This is for pages
+ * 
  * This extension is added to {@see SiteTree} to make pages aware of the 
  * Upload dir rules, force the user to choose a name before adding content,
  * and using that name to create an assets directory
@@ -111,102 +135,25 @@ class UploadDirRules_SiteTreeExtension extends DataExtension {
 		if ($this->owner->AssetsFolderID == 0) {
 			$fields->replaceField('Content', new HiddenField('Content'));
 			$fields->removeByName('Metadata');
-			
-			$msg = null;
-			if($this->owner instanceof UploadDirRulesInterface) {
-				$msg = $this->owner->getMessageSaveFirst();
-			} else {
-				//default message
-				$msg = 'Please <strong>choose a name and save</strong> for adding content.';
-			}			
-			if ($msg) {
-				$htmlField = new LiteralField('ContentPlaceholder', '
-					<p class="message notice" >' . $msg . '</p>
-				');
-				$fields->addFieldToTab('Root.Main', $htmlField, 'Title');
-			}
+
+			$htmlField = $this->owner->cmsFieldsMessage(false);
+			$fields->addFieldToTab('Root.Main', $htmlField, 'Title');
+
 		} else {
 			$dirName = UploadDirRules::current_page_directory($this->owner);
 			Upload::config()->uploads_folder = $dirName;
 
-			$msg = null;
-			if($this->owner instanceof UploadDirRulesInterface) {
-				$msg = $this->owner->getMessageUploadDirectory();
-			} else {
-				//default message
-				$msg = '<em>Files uploaded via the content area will be uploaded to</em><br /> <strong>' .Upload::config()->uploads_folder . '</strong>';
-			}			
-			if ($msg) {
-				$fields->addFieldToTab('Root.Main', 
-					new LiteralField('UploadDirectorNote', '
-					<div class="field text" id="UploadDirectorNote">
-						<label class="left">Upload Directory</label>
-						<div class="middleColumn">
-							<p style="margin-bottom: 0; padding-top: 0px;">
-								' . $msg . '
-							</p>
-						</div>
-					</div>				
+			$htmlField = $this->owner->cmsFieldsMessage(true);
 
-					'),
-				'Content');
-			}
-			
-//					<p class="message notice" >
-//					Note: Files uploaded via the content area will be uploaded to <strong>' .Upload::config()->uploads_folder . '</strong>
-//					</p>
-			
+			$fields->addFieldToTab('Root.Main', $htmlField), 'Content');
+
 		}
 		
 		
     return $fields;		
 	}		
 
-	/**
-	 * Creation and association of assets folder,
-	 * if the page name is other than the standard page name
-	 */
-	function onBeforeWrite() {
-		parent::onBeforeWrite();
-		if ($this->owner->AssetsFolderID == 0) {
-			$className = $this->owner->ClassName;
-			$translatedClassName = singleton($className)->i18n_singular_name();
-			//BTW: this will probably only work in English admin anyway
-			if ($this->owner->Title != "New $translatedClassName") {
-				
-				$url = null;
-				//check if the page we're having is implementing the UploadDirRulesInterface
-				//for rule customization
-				if($this->owner instanceof UploadDirRulesInterface) {
-					$url = $this->owner->getCalcAssetsFolderDirectory();
-				} else {
-					//else use the default settings
-					$pageUrlPart = UploadDirRules::page_directory_part($this->owner);
-					$url = $pageUrlPart;
-				}
-				
-				if ($url) {
-					//this creates the directory, and attaches it to the page
-					//- without saving it (see: false) - as this is called on "onBeforeWrite",
-					//and we're expecting the saving to be taking place just after this is called
-					$dirObj = $this->owner->FindOrMakeAssetsFolder($url, false);
-				}
-				
-			}
-		}
-		
-	}
-	
-	public function getAssetsFolderDir() {
-		if ($this->owner->getField('AssetsFolderID') != 0) {
-			$dirObj = $this->owner->AssetsFolder();
-			$dirName = str_replace('assets/', '', $dirObj->Filename);
-			return $dirName;
-		}
-	}
-	
-	
-	
+
 	
 }
 

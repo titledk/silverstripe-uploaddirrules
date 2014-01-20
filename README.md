@@ -11,3 +11,6 @@ This module is intended to work both on basic sites (see `UploadDirRules`) as we
 ## Installation
 
 	git submodule add git@bitbucket.org:titledk/silverstripe-uploaddirrules.git public/uploaddirrules
+
+
+See more instructions in `UploadDirRules.php`
