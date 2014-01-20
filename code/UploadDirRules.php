@@ -125,7 +125,7 @@ class UploadDirRules_DataObjectExtension extends DataExtension {
 			$dirName = $this->owner->getAssetsFolderDir();
 			Upload::config()->uploads_folder = $dirName;
 			$htmlField = $this->owner->cmsFieldsMessage(true);
-			$fields->addFieldToTab('Root.Main', $htmlField), 'Content');
+			$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
 		}
 		
     return $fields;		
@@ -166,7 +166,7 @@ class UploadDirRules_SiteTreeExtension extends DataExtension {
 
 			$htmlField = $this->owner->cmsFieldsMessage(true);
 
-			$fields->addFieldToTab('Root.Main', $htmlField), 'Content');
+			$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
 
 		}
 		
