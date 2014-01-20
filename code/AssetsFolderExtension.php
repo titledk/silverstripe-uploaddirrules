@@ -88,8 +88,8 @@ class AssetsFolderExtension extends DataExtension {
 			if (!$msg) {
 				$msg = $defaultMsg;
 			}
-			$field = new LiteralField('UploadDirectorNote', '
-				<div class="field text" id="UploadDirectorNote">
+			$field = new LiteralField('UploadDirRulesNote', '
+				<div class="field text" id="UploadDirRulesNote">
 					<label class="left">Upload Directory</label>
 					<div class="middleColumn">
 						<p style="margin-bottom: 0; padding-top: 0px;">
@@ -109,7 +109,7 @@ class AssetsFolderExtension extends DataExtension {
 			if (!$msg) {
 				$msg = $defaultMsg;
 			}
-			$field = new LiteralField('ContentPlaceholder', '
+			$field = new LiteralField('UploadDirRulesNote', '
 				<p class="message notice" >' . $msg . '</p>
 			');
 

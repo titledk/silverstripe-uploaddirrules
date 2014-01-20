@@ -116,16 +116,18 @@ class UploadDirRules_DataObjectExtension extends DataExtension {
 
 	function updateCMSFields(FieldList $fields) {
 		
+		$fields->removeByName('UploadDirRulesNote');
+
 		//Don't allow any content creation as long as we don't have an associated
 		//assets directory
 		if ($this->owner->AssetsFolderID == 0) {
 			$htmlField = $this->owner->cmsFieldsMessage(false);
-			$fields->addFieldToTab('Root.Main', $htmlField, 'Title');
+			$fields->addFieldToTab('Root.Main', $htmlField);
 		} else {
 			$dirName = $this->owner->getAssetsFolderDir();
 			Upload::config()->uploads_folder = $dirName;
 			$htmlField = $this->owner->cmsFieldsMessage(true);
-			$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+			$fields->addFieldToTab('Root.Main', $htmlField);
 		}
 		
     return $fields;		
