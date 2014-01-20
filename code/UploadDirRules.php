@@ -62,7 +62,7 @@ class UploadDirRules {
 			//return $page->getAssetsFolderDir();
 		}
 
-	}	
+	}
 	
 	/**
 	 * Definition of the page directory part
@@ -112,6 +112,27 @@ class UploadDirRules {
  * This is for dataobjects
  */
 class UploadDirRules_DataObjectExtension extends DataExtension {
+
+
+	function updateCMSFields(FieldList $fields) {
+		
+		//Don't allow any content creation as long as we don't have an associated
+		//assets directory
+		if ($this->owner->AssetsFolderID == 0) {
+			$htmlField = $this->owner->cmsFieldsMessage(false);
+			$fields->addFieldToTab('Root.Main', $htmlField, 'Title');
+		} else {
+			$dirName = $this->owner->getAssetsFolderDir();
+			Upload::config()->uploads_folder = $dirName;
+			$htmlField = $this->owner->cmsFieldsMessage(true);
+			$fields->addFieldToTab('Root.Main', $htmlField), 'Content');
+		}
+		
+    return $fields;		
+	}	
+
+
+
 
 }
 

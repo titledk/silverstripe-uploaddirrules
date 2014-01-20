@@ -25,7 +25,9 @@ class AssetsFolderExtension extends DataExtension {
 		return $dir;
 	}
 
-
+	/**
+	 * Name of the associated assets folder
+	 */
 	public function getAssetsFolderDir() {
 		if ($this->owner->getField('AssetsFolderID') != 0) {
 			$dirObj = $this->owner->AssetsFolder();
