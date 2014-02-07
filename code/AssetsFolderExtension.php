@@ -43,7 +43,7 @@ class AssetsFolderExtension extends DataExtension {
 	 */
 	function onBeforeWrite() {
 		parent::onBeforeWrite();
-		if ($this->owner->AssetsFolderID == 0) {
+		if (($this->owner->ID) > 0 && ($this->owner->AssetsFolderID) == 0) {
 			$className = $this->owner->ClassName;
 			$translatedClassName = singleton($className)->i18n_singular_name();
 			//BTW: this will probably only work in English admin anyway
