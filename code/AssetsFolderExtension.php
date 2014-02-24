@@ -45,9 +45,15 @@ class AssetsFolderExtension extends DataExtension {
 		if (($this->owner->ID) > 0 && ($this->owner->AssetsFolderID) == 0) {
 			$className = $this->owner->ClassName;
 			$translatedClassName = singleton($className)->i18n_singular_name();
-			//BTW: this will probably only work in English admin anyway
-			if ($this->owner->Title != "New $translatedClassName") {
-				
+
+			//This will only work for the languages defined here,
+			//at some point the supported languages could go into a configuration file
+			$title = $this->owner->Title;
+			if (
+				$title != "New $translatedClassName" && //English
+				$title != "Neue $translatedClassName" //German
+			) {
+
 				$url = null;
 				//check if the page we're having is implementing the UploadDirRulesInterface
 				//for rule customization
