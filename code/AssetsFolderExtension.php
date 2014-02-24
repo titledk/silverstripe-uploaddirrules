@@ -76,6 +76,7 @@ class AssetsFolderExtension extends DataExtension {
 	 */
 	function cmsFieldsMessage($dirExists=false){
 		$field = null;
+		$msg = null;
 		if ($dirExists) {
 			//default message
 			$defaultMsg = '<em>Files uploaded via the content area will be uploaded to</em><br /> <strong>' .Upload::config()->uploads_folder . '</strong>';
@@ -99,7 +100,7 @@ class AssetsFolderExtension extends DataExtension {
 		} else {
 			//default message
 			$defaultMsg = 'Please <strong>choose a name and save</strong> for adding content.';
-			
+
 			if($this->owner instanceof UploadDirRulesInterface) {
 				$msg = $this->owner->getMessageSaveFirst();
 			}
