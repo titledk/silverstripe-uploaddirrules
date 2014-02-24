@@ -10,8 +10,8 @@ class AssetsFolderExtension extends DataExtension {
 
 	static $has_one = array(
 		'AssetsFolder' => 'Folder' 
-	);	
-	
+	);
+
 	/**
 	 * First run: Find or make
 	 */
@@ -35,7 +35,6 @@ class AssetsFolderExtension extends DataExtension {
 			return $dirName;
 		}
 	}
-
 
 	/**
 	 * Creation and association of assets folder,
@@ -78,7 +77,6 @@ class AssetsFolderExtension extends DataExtension {
 	function cmsFieldsMessage($dirExists=false){
 		$field = null;
 		if ($dirExists) {
-
 			//default message
 			$defaultMsg = '<em>Files uploaded via the content area will be uploaded to</em><br /> <strong>' .Upload::config()->uploads_folder . '</strong>';
 
@@ -96,9 +94,8 @@ class AssetsFolderExtension extends DataExtension {
 							' . $msg . '
 						</p>
 					</div>
-				</div>				
+				</div>
 				');
-
 		} else {
 			//default message
 			$defaultMsg = 'Please <strong>choose a name and save</strong> for adding content.';
@@ -112,13 +109,8 @@ class AssetsFolderExtension extends DataExtension {
 			$field = new LiteralField('UploadDirRulesNote', '
 				<p class="message notice" >' . $msg . '</p>
 			');
-
 		}
 		return $field;
-
 	}
 
-
-
-	
 }

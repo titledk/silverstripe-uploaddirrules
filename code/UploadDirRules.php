@@ -2,10 +2,13 @@
 /**
  * Helper for consistent upload directories
  * 
- * These rules assure that files are being uploaded to a subdirectory of the "assets" directory.
- * Additionally, files are saved in directories, corresponding to the page that is currently being edited.
+ * These rules assure that files are being uploaded to a subdirectory of
+ * the "assets" directory.
+ * Additionally, files are saved in directories, corresponding to the page
+ * that is currently being edited.
  * 
- * In order for this to work out-of the box, the following extensions need to be configured:
+ * In order for this to work out-of the box, the following extensions need to be
+ * configured:
  *
  *
  * For Pages:
@@ -13,7 +16,7 @@
  * SiteTree:
  *   extensions:
  *     - AssetsFolderExtension
- *		 - UploadDirRules_SiteTreeExtension
+ *     - UploadDirRules_SiteTreeExtension
  * LeftAndMain:
  *   extensions:
  *    - UploadDirRules_LeftAndMainExtension 
@@ -144,15 +147,14 @@ class UploadDirRules_DataObjectExtension extends DataExtension {
 /**
  * This is for pages
  * 
- * This extension is added to {@see SiteTree} to make pages aware of the 
+ * This extension is added to {@see SiteTree} to make pages aware of the
  * Upload dir rules, force the user to choose a name before adding content,
  * and using that name to create an assets directory
  */
 class UploadDirRules_SiteTreeExtension extends DataExtension {
-	
-	
+
 	function updateCMSFields(FieldList $fields) {
-		
+
 		//Don't allow any content creation as long as we don't have an associated
 		//assets directory
 		if ($this->owner->AssetsFolderID == 0) {
@@ -171,13 +173,10 @@ class UploadDirRules_SiteTreeExtension extends DataExtension {
 			$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
 
 		}
-		
-		
-    return $fields;		
-	}		
 
+		return $fields;
+	}
 
-	
 }
 
 
@@ -186,7 +185,7 @@ class UploadDirRules_SiteTreeExtension extends DataExtension {
  * when working with subsites
  */
 class UploadDirRules_LeftAndMainExtension extends LeftAndMainExtension {
-	
+
 	public function init() {
 		//setting the uploads directory to make sure all images are saved
 		//according to the rules set in {@see UploadDirRules}
@@ -208,5 +207,5 @@ class UploadDirRules_LeftAndMainExtension extends LeftAndMainExtension {
 			
 		}
 		
-	}	
+	}
 }
