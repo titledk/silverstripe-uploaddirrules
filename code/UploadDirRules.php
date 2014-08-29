@@ -35,7 +35,7 @@
  * @author Anselm Christophersen <ac@title.dk>
  * @copyright Copyright (c) 2014, Title Web Solutions
  */
-class UploadDirRules {
+class UploadDirRules extends Object {
 
 	//set true for testing
 	private static $dryrun = false;
@@ -118,22 +118,34 @@ class UploadDirRules_DataObjectExtension extends DataExtension {
 
 
 	function updateCMSFields(FieldList $fields) {
+
+		//cms fields can be disabled via config
+		$noCmsFields = false;
+		if (UploadDirRules::config()->noCmsFields) {
+			$noCmsFields = true;
+		}
+		
 		
 		$fields->removeByName('UploadDirRulesNote');
 
 		//Don't allow any content creation as long as we don't have an associated
 		//assets directory
 		if ($this->owner->AssetsFolderID == 0) {
-			$htmlField = $this->owner->cmsFieldsMessage(false);
-			$fields->addFieldToTab('Root.Main', $htmlField);
+			if (!$noCmsFields) {
+				$htmlField = $this->owner->cmsFieldsMessage(false);
+				$fields->addFieldToTab('Root.Main', $htmlField);
+			}
 		} else {
 			$dirName = $this->owner->getAssetsFolderDir();
 			Upload::config()->uploads_folder = $dirName;
-			$htmlField = $this->owner->cmsFieldsMessage(true);
-			$fields->addFieldToTab('Root.Main', $htmlField);
+
+			if (!$noCmsFields) {
+				$htmlField = $this->owner->cmsFieldsMessage(true);
+				$fields->addFieldToTab('Root.Main', $htmlField);
+			}
 		}
 		
-    return $fields;		
+    return $fields;
 	}	
 
 

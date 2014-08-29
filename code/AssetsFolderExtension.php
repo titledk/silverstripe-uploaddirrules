@@ -42,6 +42,14 @@ class AssetsFolderExtension extends DataExtension {
 	 */
 	function onBeforeWrite() {
 		parent::onBeforeWrite();
+		
+		//If upload dir rules have been configured to not do an onbefore write
+		//do nothing
+		if (UploadDirRules::config()->noOnBeforWrite) {
+			return;
+		}
+		
+		
 		if (($this->owner->ID) > 0 && ($this->owner->AssetsFolderID) == 0) {
 			$className = $this->owner->ClassName;
 			$translatedClassName = singleton($className)->i18n_singular_name();
