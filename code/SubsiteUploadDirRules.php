@@ -41,7 +41,7 @@ class SubsiteUploadDirRules extends UploadDirRules {
 		$dirObj = null;
 		
 		if ($subsite) {
-			if ((int) $subsite->AssetsFolderID == 0 || self::$dryrun) {
+			if ((int) $subsite->AssetsFolderID == 0) {
 				$title = $subsite->Title;
 				$url = singleton('SiteTree')->generateURLSegment($title);
 				//$dirObj = self::find_or_make_folder_site_upload_directory($url, $subsite);
@@ -51,7 +51,7 @@ class SubsiteUploadDirRules extends UploadDirRules {
 			}
 		} else {
 			$sc = SiteConfig::current_site_config();
-			if ((int) $sc->AssetsFolderID == 0 || self::$dryrun) {
+			if ((int) $sc->AssetsFolderID == 0) {
 				$title = $sc->Title;
 				$url = singleton('SiteTree')->generateURLSegment($title);
 				//$dirObj = self::find_or_make_folder_site_upload_directory($url, $sc);
