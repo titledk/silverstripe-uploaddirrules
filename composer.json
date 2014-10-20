@@ -1,9 +1,9 @@
 {
   "name": "titledk/silverstripe-uploaddirrules",
-  "description": "Rules to automatically keep the SilverStripe assets directory tidy",
+  "description": "Rules to keep the SilverStripe assets directory tidy",
   "type": "silverstripe-module",
   "homepage": "https://bitbucket.org/titledk/silverstripe-gallery",
-  "keywords": ["silverstripe", "assets"],
+  "keywords": ["silverstripe", "assets", "subsites"],
   "authors": [
     {"name": "Anselm Christophersen","email": "ac@anselm.dk"}
   ],
