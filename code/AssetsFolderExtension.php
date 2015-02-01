@@ -4,7 +4,7 @@
  * to a folder inside /assets
  * 
  * @author Anselm Christophersen <ac@title.dk>
- * @copyright Copyright (c) 2013, Title Web Solutions
+ * @copyright Copyright (c) 2015, Title Web Solutions
  */
 class AssetsFolderExtension extends DataExtension {
 
@@ -12,10 +12,86 @@ class AssetsFolderExtension extends DataExtension {
 		'AssetsFolder' => 'Folder' 
 	);
 
+
 	/**
-	 * First run: Find or make
+	 * Displaying assets folder relation in CMS fields
+	 * as well as setting the global upload config
+	 * 
+	 * @param FieldList $fields
+	 * @return FieldList|void
 	 */
-	public function FindOrMakeAssetsFolder($url, $doWrite = true){
+	function updateCMSFields(FieldList $fields) {
+		$dirName = $this->owner->getAssetsFolderDirName();
+		$dirExists = false;
+		
+		if ($dirName) {
+			$dirExists = true;
+			Upload::config()->uploads_folder = $dirName;
+		}
+
+		//Fields
+		//TODO make it configurable if they should be shown
+		//TODO make field placement configurable
+		$htmlField = $this->owner->cmsFieldsMessage($dirExists);
+		$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+
+		return $fields;
+	}
+	
+
+	/**
+	 * Creation and association of assets folder,
+	 * once a data object has been created (and is ready for it)
+	 */
+	function onBeforeWrite() {
+		parent::onBeforeWrite();
+
+		//creation will only be considered if the object has an ID
+		//and has no folder relation
+		if (($this->owner->ID) > 0 && ($this->owner->AssetsFolderID) == 0) {
+
+			//the default rules only require the object to have an ID
+			//but more sophisticated rules might require more - e.g. a title to be set
+			//thus we check if the object is ready for folder creation - if custom rules
+			//(UploadDirRulesInterface) habe been set
+			if($this->owner instanceof UploadDirRulesInterface) {
+				if (! $this->owner->getReadyForFolderCreation()) {
+					return false;
+				}
+			}
+
+			$url = null;
+			//check if the page we're having is implementing the UploadDirRulesInterface
+			//for rule customization
+			if($this->owner instanceof UploadDirRulesInterface) {
+				$url = $this->owner->getCalcAssetsFolderDirectory();
+			} else {
+				//else use the default settings
+				
+				$class = UploadDirRules::get_rules_class();
+				$url = $class::calc_full_directory_for_object($this->owner);
+			}
+
+			if ($url) {
+				//this creates the directory, and attaches it to the page
+				//- without saving it (see: false) - as this is called on "onBeforeWrite",
+				//and we're expecting the saving to be taking place just after this is called
+				$dirObj = $this->owner->findOrMakeAssetsFolder($url, false);
+			}
+		}
+
+	}
+	
+	
+	/**
+	 * Find or make assets folder
+	 * called from onBeforeWrite
+	 * 
+	 * @param string  $url
+	 * @param bool    $doWrite
+	 * @return Folder|null
+	 */
+	protected function findOrMakeAssetsFolder($url, $doWrite = true){
 		$owner = $this->owner;
 		$dir = Folder::find_or_make($url);
 		$owner->AssetsFolderID = $dir->ID;
@@ -25,10 +101,12 @@ class AssetsFolderExtension extends DataExtension {
 		return $dir;
 	}
 
+
 	/**
 	 * Name of the associated assets folder
+	 * @return string|null
 	 */
-	public function getAssetsFolderDir() {
+	public function getAssetsFolderDirName() {
 		if ($this->owner->getField('AssetsFolderID') != 0) {
 			$dirObj = $this->owner->AssetsFolder();
 			$dirName = str_replace('assets/', '', $dirObj->Filename);
@@ -36,71 +114,29 @@ class AssetsFolderExtension extends DataExtension {
 		}
 	}
 
-	/**
-	 * Creation and association of assets folder,
-	 * if the page name is other than the standard page name
-	 */
-	function onBeforeWrite() {
-		parent::onBeforeWrite();
-		
-		//If upload dir rules have been configured to not do an onbefore write
-		//do nothing
-		if (UploadDirRules::config()->noOnBeforWrite) {
-			return;
-		}
-		
-		
-		if (($this->owner->ID) > 0 && ($this->owner->AssetsFolderID) == 0) {
-			$className = $this->owner->ClassName;
-			$translatedClassName = singleton($className)->i18n_singular_name();
-
-			//This will only work for the languages defined here,
-			//at some point the supported languages could go into a configuration file
-			$title = $this->owner->Title;
-			if (
-				$title != "New $translatedClassName" && //English
-				$title != "Neue $translatedClassName" //German
-			) {
-
-				$url = null;
-				//check if the page we're having is implementing the UploadDirRulesInterface
-				//for rule customization
-				if($this->owner instanceof UploadDirRulesInterface) {
-					$url = $this->owner->getCalcAssetsFolderDirectory();
-				} else {
-					//else use the default settings
-					$pageUrlPart = UploadDirRules::page_directory_part($this->owner);
-					$url = $pageUrlPart;
-				}
-				
-				if ($url) {
-					//this creates the directory, and attaches it to the page
-					//- without saving it (see: false) - as this is called on "onBeforeWrite",
-					//and we're expecting the saving to be taking place just after this is called
-					$dirObj = $this->owner->FindOrMakeAssetsFolder($url, false);
-				}
-				
-			}
-		}
-		
-	}
 
 	/**
 	 * Upload Dir Rules message to display in the CMS
+	 * 
+	 * @param bool $dirExists
+	 * @return LiteralField|null
 	 */
-	function cmsFieldsMessage($dirExists=false){
+	protected function cmsFieldsMessage($dirExists = false){
 		$field = null;
 		$msg = null;
 		if ($dirExists) {
-			//default message
-			$defaultMsg = '<em>Files uploaded via the content area will be uploaded to</em><br /> <strong>' .Upload::config()->uploads_folder . '</strong>';
-
+			
+			//Message
+			$defaultMsg = '<em>Files uploaded via the content area will be uploaded to</em>' .
+				'<br /> <strong>'  .Upload::config()->uploads_folder . '</strong>';
 			if($this->owner instanceof UploadDirRulesInterface) {
 				$msg = $this->owner->getMessageUploadDirectory();
 			}
 			if (!$msg) {
 				$msg = $defaultMsg;
 			}
+			
+			//Field
 			$field = new LiteralField('UploadDirRulesNote', '
 				<div class="field text" id="UploadDirRulesNote">
 					<label class="left">Upload Directory</label>
@@ -112,9 +148,9 @@ class AssetsFolderExtension extends DataExtension {
 				</div>
 				');
 		} else {
-			//default message
+			
+			//Message
 			$defaultMsg = 'Please <strong>choose a name and save</strong> for adding content.';
-
 			if($this->owner instanceof UploadDirRulesInterface) {
 				$msg = $this->owner->getMessageSaveFirst();
 			}
