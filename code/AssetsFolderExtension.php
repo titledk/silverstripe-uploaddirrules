@@ -32,7 +32,7 @@ class AssetsFolderExtension extends DataExtension {
 		//Fields
 		//TODO make it configurable if they should be shown
 		//TODO make field placement configurable
-		$htmlField = $this->owner->cmsFieldsMessage($dirExists);
+		$htmlField = $this->cmsFieldsMessage($dirExists);
 		$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
 
 		return $fields;
@@ -76,7 +76,7 @@ class AssetsFolderExtension extends DataExtension {
 				//this creates the directory, and attaches it to the page
 				//- without saving it (see: false) - as this is called on "onBeforeWrite",
 				//and we're expecting the saving to be taking place just after this is called
-				$dirObj = $this->owner->findOrMakeAssetsFolder($url, false);
+				$dirObj = $this->findOrMakeAssetsFolder($url, false);
 			}
 		}
 
