@@ -173,16 +173,29 @@ class AssetsFolderExtension extends DataExtension {
 			}
 			
 			//Field
-			$field = new LiteralField('UploadDirRulesNote', '
-				<div class="field text" id="UploadDirRulesNote">
-					<label class="left">Upload Directory</label>
-					<div class="middleColumn">
-						<p style="margin-bottom: 0; padding-top: 0px;">
-							' . $msg . '
-						</p>
-					</div>
-				</div>
-				');
+			//$field = new LiteralField('UploadDirRulesNote', '
+			//	<div class="field text" id="UploadDirRulesNote">
+			//		<label class="left">Upload Directory</label>
+			//		<div class="middleColumn">
+			//			<p style="margin-bottom: 0; padding-top: 0px;">
+			//				' . $msg . '
+			//			</p>
+			//		</div>
+			//	</div>
+			//	');
+			
+			$field = new AssetsFolderURLSegmentField('UploadDir', 'Upload Directory');
+			$baseLink = Controller::join_links (
+				Director::absoluteBaseURL(),
+				'assets/'
+				//TODO the subsite part should go here as well
+			);
+			$field->setURLPrefix($baseLink);
+			$field->setValue(Upload::config()->uploads_folder);
+			$field->setAssetsFolderID($this->owner->AssetsFolderID);
+
+			//$field->setHelpText('Note that if you change this directory, you might need to update links to any uploaded images in the content area.');
+			
 		} else {
 			
 			//Message

@@ -12,8 +12,12 @@ This module is currently being remodelled - use the `legacy` branch for now.
 ## Planned enhancements
 
 * asset folder editable from CMS - a little like `urlsegment`
-* [DONE] create asset folder on first page (draft) create
-* allowing to rename subsite assets folder
+* **[DONE]** create asset folder on first page (draft) create
+* **[UNDER DEVELOPMENT]** allowing to rename subsite assets folder
+* method that lists all rules for printing or display, e.g.
+	* pages: `/my-subsite/pages/`
+	* siteconfig: `/my-subsite/site`
+	* etc.
 
 ## Configuration example
 
