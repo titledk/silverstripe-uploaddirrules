@@ -52,7 +52,8 @@ class AssetsFolderExtension extends DataExtension {
 			}
 		}
 		if ($isPage) {
-			$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+			//$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+			$fields->addFieldToTab('Root.Main', $htmlField);
 		} else {
 
 			//TODO make this configurable
@@ -184,17 +185,38 @@ class AssetsFolderExtension extends DataExtension {
 			//	</div>
 			//	');
 			
-			$field = new AssetsFolderURLSegmentField('UploadDir', 'Upload Directory');
-			$baseLink = Controller::join_links (
-				Director::absoluteBaseURL(),
-				'assets/'
-				//TODO the subsite part should go here as well
-			);
-			$field->setURLPrefix($baseLink);
-			$field->setValue(Upload::config()->uploads_folder);
-			$field->setAssetsFolderID($this->owner->AssetsFolderID);
+			//$field = new AssetsFolderURLSegmentField('UploadDir', 'Upload Directory');
+			//$baseLink = Controller::join_links (
+			//	Director::absoluteBaseURL(),
+			//	'assets/'
+			//	//TODO the subsite part should go here as well
+			//);
+			//$field->setURLPrefix($baseLink);
+			//$field->setValue(Upload::config()->uploads_folder);
+			//$field->setAssetsFolderID($this->owner->AssetsFolderID);
 
 			//$field->setHelpText('Note that if you change this directory, you might need to update links to any uploaded images in the content area.');
+
+
+			$field1 = new TreeDropdownField("AssetsFolderID", "Upload Directory", "Folder");
+			$field1->setRightTitle('Files on this object will be uploaded to this directory');
+
+			$dir = $this->owner->AssetsFolder();
+			$filescount = File::get()->filter( array("ParentID"=>$dir->ID) )->count();
+
+			$field2 = new LiteralField("addnew",
+					"<p><a href='/admin/assets/show/".$dir->ID."' class='ss-ui-button ss-ui-action-constructive ui-button' data-icon=add>
+					Manage Upload Directory (".$filescount.")</span></a></p>");
+			
+			
+			$field = new CompositeField(array(
+				$field1,
+				$field2
+			));
+			
+			
+			
+			
 			
 		} else {
 			
