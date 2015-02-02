@@ -26,14 +26,51 @@ class AssetsFolderExtension extends DataExtension {
 		
 		if ($dirName) {
 			$dirExists = true;
+			//Setting and showing the uploads folder
+			//This doesn't work for iframe uploads, there we need 
+			//the AssetsFolderAdmin extension to LeftAndMain
 			Upload::config()->uploads_folder = $dirName;
+			
+			//Cookie fallback for moments where it's impossible to figure
+			//out the uploads folder through the leftandmain controller.
+			//e.g. ModelAdmin - {@see AssetsFolderAdmin}
+			Cookie::set('cms-uploaddirrules-uploads-folder', $dirName);
 		}
 
 		//Fields
 		//TODO make it configurable if they should be shown
 		//TODO make field placement configurable
 		$htmlField = $this->cmsFieldsMessage($dirExists);
-		$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+		
+		
+		//Adding fields - to tab or just pushing
+		$isPage = false;
+		$ancestry = $this->owner->getClassAncestry();
+		foreach ($ancestry as $c) {
+			if ($c == 'SiteTree') {
+				$isPage = true;
+			}
+		}
+		if ($isPage) {
+			$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+		} else {
+
+			//TODO make this configurable
+			switch ($this->owner->ClassName) {
+
+				case 'Subsite':
+					$fields->addFieldToTab('Root.Configuration', $htmlField);
+					break;
+
+				case 'SiteConfig':
+					$fields->addFieldToTab('Root.Main', $htmlField);
+					break;
+
+				default:
+					$fields->push($htmlField);
+			}
+			
+		}
 
 		return $fields;
 	}
@@ -43,17 +80,16 @@ class AssetsFolderExtension extends DataExtension {
 	 * Creation and association of assets folder,
 	 * once a data object has been created (and is ready for it)
 	 */
-	function onBeforeWrite() {
-		parent::onBeforeWrite();
+	function onAfterWrite() {
+		parent::onAfterWrite();
 
-		//creation will only be considered if the object has an ID
-		//and has no folder relation
-		if (($this->owner->ID) > 0 && ($this->owner->AssetsFolderID) == 0) {
-
+		//creation will only be considered if the object has no folder relation
+		if ($this->owner->AssetsFolderID == 0) {
+			
 			//the default rules only require the object to have an ID
 			//but more sophisticated rules might require more - e.g. a title to be set
 			//thus we check if the object is ready for folder creation - if custom rules
-			//(UploadDirRulesInterface) habe been set
+			//(UploadDirRulesInterface) have been set
 			if($this->owner instanceof UploadDirRulesInterface) {
 				if (! $this->owner->getReadyForFolderCreation()) {
 					return false;
@@ -73,14 +109,14 @@ class AssetsFolderExtension extends DataExtension {
 			}
 
 			if ($url) {
-				//this creates the directory, and attaches it to the page
-				//- without saving it (see: false) - as this is called on "onBeforeWrite",
-				//and we're expecting the saving to be taking place just after this is called
-				$dirObj = $this->findOrMakeAssetsFolder($url, false);
+				//this creates the directory, and attaches it to the page,
+				//as well as saving the object one more time - with the attached folder
+				$dirObj = $this->findOrMakeAssetsFolder($url, true);
 			}
 		}
 
 	}
+
 	
 	
 	/**

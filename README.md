@@ -9,6 +9,28 @@ Rules to automatically keep the SilverStripe assets directory tidy.
 This module is currently being remodelled - use the `legacy` branch for now.
 
 
+## Planned enhancements
+
+* asset folder editable from CMS - a little like `urlsegment`
+* [DONE] create asset folder on first page (draft) create
+* allowing to rename subsite assets folder
+
+## Configuration example
+
+    SiteTree:
+      extensions:
+        - AssetsFolderExtension
+    SiteConfig:
+      extensions:
+        - AssetsFolderExtension
+    Subsite:
+      extensions:
+        - AssetsFolderExtension
+    LeftAndMain:
+      extensions:
+        - AssetsFolderAdmin
+
+
 
 ## Unit tests
 

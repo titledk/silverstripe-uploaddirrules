@@ -15,8 +15,8 @@ class SubsiteUploadDirRules extends UploadDirRules {
 	 * 
 	 * @return bool|string
 	 */
-	public static function calc_directory_for_subsite(){
-		$subsite = Subsite::currentSubsite();
+	public static function calc_directory_for_subsite($subsite){
+		//$subsite = Subsite::currentSubsite();
 		if ($subsite) {
 			$title = $subsite->Title;
 			$url = strtolower(singleton('SiteTree')->generateURLSegment($title));
@@ -32,7 +32,7 @@ class SubsiteUploadDirRules extends UploadDirRules {
 	 * 
 	 * @return bool|mixed
 	 */
-	public static function get_directory_for_subsite(){
+	public static function get_directory_for_current_subsite(){
 		$subsite = Subsite::currentSubsite();
 		if ($subsite) {
 			if ((int) $subsite->AssetsFolderID > 0) {
@@ -49,6 +49,14 @@ class SubsiteUploadDirRules extends UploadDirRules {
 		}
 	}
 
+	/**
+	 * Alias for get_directory_for_current_subsite
+	 * DEPRECATED
+	 */
+	public static function get_directory_for_subsite(){
+		return self::get_directory_for_current_subsite();
+	}
+
 
 	/**
 	 * Full subsite directory
@@ -59,13 +67,15 @@ class SubsiteUploadDirRules extends UploadDirRules {
 	public static function calc_full_directory_for_object(DataObject $do){
 		
 		if ($do->ClassName == 'Subsite') {
-			//If we're dealing with an actual subsite, we only want the subsite part
-			return self::calc_directory_for_subsite();
+			//This is the subsite creation
+			//we only want the subsite part
+			return self::calc_directory_for_subsite($do);
 		} else {
 			//If we're dealing with a path inside of a subsites,
 			//we need at least be sure that the subsite is having an asset directory
-
-			$subsite_dir = self::get_directory_for_subsite();
+			//NOTE: this only works when on the actual subsite
+			
+			$subsite_dir = self::get_directory_for_current_subsite();
 			if ($subsite_dir) {
 				$str = parent::calc_full_directory_for_object($do);
 				$str = "$subsite_dir/$str";
