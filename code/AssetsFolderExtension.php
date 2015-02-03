@@ -37,10 +37,10 @@ class AssetsFolderExtension extends DataExtension {
 			Cookie::set('cms-uploaddirrules-uploads-folder', $dirName);
 		}
 
-		//Fields
-		//TODO make it configurable if they should be shown
+		//The Upload Directory field
+		//TODO make it configurable if field should be shown
 		//TODO make field placement configurable
-		$htmlField = $this->cmsFieldsMessage($dirExists);
+		$field = $this->getAssetsFolderField($dirExists);
 		
 		
 		//Adding fields - to tab or just pushing
@@ -53,22 +53,22 @@ class AssetsFolderExtension extends DataExtension {
 		}
 		if ($isPage) {
 			//$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
-			$fields->addFieldToTab('Root.Main', $htmlField);
+			$fields->addFieldToTab('Root.Main', $field);
 		} else {
 
 			//TODO make this configurable
 			switch ($this->owner->ClassName) {
 
 				case 'Subsite':
-					$fields->addFieldToTab('Root.Configuration', $htmlField);
+					$fields->addFieldToTab('Root.Configuration', $field);
 					break;
 
 				case 'SiteConfig':
-					$fields->addFieldToTab('Root.Main', $htmlField);
+					$fields->addFieldToTab('Root.Main', $field);
 					break;
 
 				default:
-					$fields->push($htmlField);
+					$fields->push($field);
 			}
 			
 		}
@@ -112,7 +112,7 @@ class AssetsFolderExtension extends DataExtension {
 			if ($url) {
 				//this creates the directory, and attaches it to the page,
 				//as well as saving the object one more time - with the attached folder
-				$dirObj = $this->findOrMakeAssetsFolder($url, true);
+				$this->findOrMakeAssetsFolder($url, true);
 			}
 		}
 
@@ -153,14 +153,21 @@ class AssetsFolderExtension extends DataExtension {
 
 
 	/**
-	 * Upload Dir Rules message to display in the CMS
+	 * Upload Dir Rules message and fields to display in the CMS
 	 * 
 	 * @param bool $dirExists
 	 * @return LiteralField|null
 	 */
-	protected function cmsFieldsMessage($dirExists = false){
+	protected function getAssetsFolderField(){
 		$field = null;
 		$msg = null;
+		
+		$dirName = $this->owner->getAssetsFolderDirName();
+		$dirExists = false;
+		if ($dirName) {
+			$dirExists = true;
+		}
+		
 		if ($dirExists) {
 			
 			//Message
@@ -172,30 +179,6 @@ class AssetsFolderExtension extends DataExtension {
 			if (!$msg) {
 				$msg = $defaultMsg;
 			}
-			
-			//Field
-			//$field = new LiteralField('UploadDirRulesNote', '
-			//	<div class="field text" id="UploadDirRulesNote">
-			//		<label class="left">Upload Directory</label>
-			//		<div class="middleColumn">
-			//			<p style="margin-bottom: 0; padding-top: 0px;">
-			//				' . $msg . '
-			//			</p>
-			//		</div>
-			//	</div>
-			//	');
-			
-			//$field = new AssetsFolderURLSegmentField('UploadDir', 'Upload Directory');
-			//$baseLink = Controller::join_links (
-			//	Director::absoluteBaseURL(),
-			//	'assets/'
-			//	//TODO the subsite part should go here as well
-			//);
-			//$field->setURLPrefix($baseLink);
-			//$field->setValue(Upload::config()->uploads_folder);
-			//$field->setAssetsFolderID($this->owner->AssetsFolderID);
-
-			//$field->setHelpText('Note that if you change this directory, you might need to update links to any uploaded images in the content area.');
 
 			//TODO these could also be global settings
 			$manageAble = true;
@@ -264,14 +247,6 @@ class AssetsFolderExtension extends DataExtension {
 					</div>
 					');
 			}
-			
-
-			
-			
-			
-			
-			
-			
 			
 		} else {
 			
