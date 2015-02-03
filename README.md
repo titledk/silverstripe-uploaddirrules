@@ -2,22 +2,28 @@
 
 _by title.dk/Anselm Christophersen_
 
+Rules and utilities to keep the SilverStripe assets directory tidy.
 
-Rules to automatically keep the SilverStripe assets directory tidy.
+By installing this module and adding extensions to the objects you want affected,
+these objects will receive an associated folder inside of assets.    
+Now instead of bluntly uploading everything to `assets/Uploads` your site will
+upload files more controlled - defaults are set, which are easy to override.
+
+Each object's folder can subsequently easily be changed through the admin, which
+allows for sophisticated files & assets strategies.
+
+![Administration](docs/img/admin.png)
 
 
-This module is currently being remodelled - use the `legacy` branch for now.
+**Upload rules are enforced both when uploading through an upload field, but also 
+when uploading through the text editor**    
+_(thanks to the `AssetsFolderAdmin` extension)_  
 
+This is especially helpful when working with [Subsites](https://github.com/silverstripe/silverstripe-subsites/)
+(we're specifically catering for those with `SubsitesUploadDirRules`), but also helpful
+in general, or when needing a basic [gallery](https://github.com/titledk/silverstripe-gallery),
+a downloads page, or anything else where you wont' want your files scattered all over the place.
 
-## Planned enhancements
-
-* asset folder editable from CMS - a little like `urlsegment`
-* **[DONE]** create asset folder on first page (draft) create
-* **[UNDER DEVELOPMENT]** allowing to rename subsite assets folder
-* method that lists all rules for printing or display, e.g.
-	* pages: `/my-subsite/pages/`
-	* siteconfig: `/my-subsite/site`
-	* etc.
 
 ## Configuration example
 
@@ -35,6 +41,31 @@ This module is currently being remodelled - use the `legacy` branch for now.
         - AssetsFolderAdmin
 
 
+
+## Basic rules
+
+The basic rules are defined in `UploadDirRules::calc_base_directory_for_object()`, basically
+putting all files related to `DataObject` into a `dataobjects` folder, everything related to
+`SiteTree` into a `pages` folder and everything related to `SiteConfig` into a `site` folder. 
+
+
+
+## Overriding default upload dir rules
+
+Just implement the `UploadDirRulesInterface`.    
+Customization through SilverStripe's config is planned, send a pull request if you need it!
+
+Rules can be anything, from just being a common folder to containing id and or title.
+
+
+## Planned enhancements
+
+* method that lists all rules for printing or display, alseo those set via `UploadDirRulesInterface` e.g.
+	* pages: `/my-subsite/pages/`
+	* siteconfig: `/my-subsite/site`
+	* etc.
+* method that lists all objects and their asset folders
+	* mainly for review / checking up, will probably be used on `UploadDirRulesTestTask`
 
 ## Unit tests
 

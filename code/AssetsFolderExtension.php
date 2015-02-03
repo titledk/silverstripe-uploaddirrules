@@ -197,22 +197,77 @@ class AssetsFolderExtension extends DataExtension {
 
 			//$field->setHelpText('Note that if you change this directory, you might need to update links to any uploaded images in the content area.');
 
-
-			$field1 = new TreeDropdownField("AssetsFolderID", "Upload Directory", "Folder");
-			$field1->setRightTitle('Files on this object will be uploaded to this directory');
-
-			$dir = $this->owner->AssetsFolder();
-			$filescount = File::get()->filter( array("ParentID"=>$dir->ID) )->count();
-
-			$field2 = new LiteralField("addnew",
-					"<p><a href='/admin/assets/show/".$dir->ID."' class='ss-ui-button ss-ui-action-constructive ui-button' data-icon=add>
-					Manage Upload Directory (".$filescount.")</span></a></p>");
+			//TODO these could also be global settings
+			$manageAble = true;
+			$editable = true;
+			
+			//As this is happening from the subsites administration, when editing a subsite
+			//you'd probably be on another site, and hence can't access the site's files anyway
+			if ($this->owner->ClassName == 'Subsite') {
+				$manageAble = false;
+				$editable = false;
+			}
 			
 			
-			$field = new CompositeField(array(
-				$field1,
-				$field2
-			));
+			if ($editable) {
+				
+				//Asset folder is editable
+				
+				$field1 = new TreeDropdownField("AssetsFolderID", "Change Directory:", "Folder");
+				$field1->setRightTitle('Directory changes take place after saving.');
+				
+				//Dropdown field style adjustments
+				//TODO move this to an external stylesheet as these styles don't kick in on AJAX loads
+				Requirements::customCSS("
+					#TreeDropdownField_Form_EditForm_AssetsFolderID {
+						min-width: 260px;
+					}
+					.UploadDirectoryFields .fieldgroup label {
+						padding: 0 0 4px;
+					}
+				");
+				
+				$dir = $this->owner->AssetsFolder();
+				$filescount = File::get()->filter( array("ParentID"=>$dir->ID) )->count();
+	
+				$manageButton = null;
+				if ($manageAble) {
+					$manageButton = 
+					"<a href='/admin/assets/show/".$dir->ID."' class='ss-ui-button ss-ui-button-small ui-button'>
+						Manage Files (".$filescount.")</a>";
+				}
+				
+				$field2 = new LiteralField("UploadDirRulesNote",
+						"<div style='margin-bottom:10px;margin-right:16px;'>$msg</div>" . $manageButton);
+				
+				$field = new FieldGroup(array(
+					$field2,
+					$field1
+				));
+				
+				$field->setTitle('Upload Directory');
+				$field->addExtraClass('UploadDirectoryFields');
+			} else {
+				
+				//Asset folder is not editable
+				
+				$field = new LiteralField('UploadDirRulesNote', '
+					<div class="field text" id="UploadDirRulesNote">
+						<label class="left">Upload Directory</label>
+						<div class="middleColumn">
+							<p style="margin-bottom: 0; padding-top: 0px;">
+								' . $msg . '
+								<br />
+								<em>If you need to edit or change this folder, please contact your administrator.</em>
+							</p>
+						</div>
+					</div>
+					');
+			}
+			
+
+			
+			
 			
 			
 			
