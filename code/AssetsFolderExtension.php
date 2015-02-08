@@ -141,6 +141,14 @@ class AssetsFolderExtension extends DataExtension {
 		if ($doWrite) {
 			$owner->write();
 		}
+
+		//Special case for when creating a new subsite
+		//the directory will need to be associated with the subsite 
+		if ($owner->ClassName == 'Subsite') {
+			$dir->SubsiteID = $owner->ID;
+			$dir->write();
+		}
+		
 		return $dir;
 	}
 
