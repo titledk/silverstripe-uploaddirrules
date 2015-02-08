@@ -51,26 +51,32 @@ class AssetsFolderExtension extends DataExtension {
 				$isPage = true;
 			}
 		}
-		if ($isPage) {
-			//$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
-			$fields->addFieldToTab('Root.Main', $field);
+		
+		//configurable tab
+		$tab = $this->owner->config()->uploaddirrules_fieldtab;
+		if (isset($tab)) {
+			$fields->addFieldToTab($tab, $field);
 		} else {
-
-			//TODO make this configurable
-			switch ($this->owner->ClassName) {
-
-				case 'Subsite':
-					$fields->addFieldToTab('Root.Configuration', $field);
-					break;
-
-				case 'SiteConfig':
-					$fields->addFieldToTab('Root.Main', $field);
-					break;
-
-				default:
-					$fields->push($field);
+			if ($isPage) {
+				//$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+				$fields->addFieldToTab('Root.Main', $field);
+			} else {
+	
+				switch ($this->owner->ClassName) {
+	
+					case 'Subsite':
+						$fields->addFieldToTab('Root.Configuration', $field);
+						break;
+	
+					case 'SiteConfig':
+						$fields->addFieldToTab('Root.Main', $field);
+						break;
+	
+					default:
+						$fields->push($field);
+				}
+				
 			}
-			
 		}
 
 		return $fields;
