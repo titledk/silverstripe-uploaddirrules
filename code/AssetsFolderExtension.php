@@ -230,6 +230,7 @@ class AssetsFolderExtension extends DataExtension {
 				
 				$field->setTitle('Upload Directory');
 				$field->addExtraClass('UploadDirectoryFields');
+				$field->setName('UploadDirectoryFields');
 			} else {
 				
 				//Asset folder is not editable
