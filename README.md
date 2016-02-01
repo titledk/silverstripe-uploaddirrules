@@ -59,26 +59,27 @@ Rules can be anything, from just being a common folder to containing id and or t
 
 ### Example
 
-    /**
-     * Images related to the portfolio page should just be saved under "portfolio"
-     * @return string
-     */
-    function getCalcAssetsFolderDirectory() {
-        if ($this->ID) {
-            $url = "portfolio";
-            return $url;
-        }
+```php
+/**
+ * Images related to the portfolio page should just be saved under "portfolio"
+ * @return string
+ */
+function getCalcAssetsFolderDirectory() {
+    if ($this->ID) {
+        $url = "portfolio";
+        return $url;
     }
-    function getMessageSaveFirst(){
-        return 'You will be able to add images once you save for the first time.';
+}
+function getMessageSaveFirst(){
+    return 'You will be able to add images once you save for the first time.';
+}
+function getMessageUploadDirectory() {
+    return null;
+}
+function getReadyForFolderCreation() {
+    return true;
     }
-    function getMessageUploadDirectory() {
-        return null;
-    }
-    function getReadyForFolderCreation() {
-        return true;
-    }
-
+```
 
 ## Planned enhancements
 
