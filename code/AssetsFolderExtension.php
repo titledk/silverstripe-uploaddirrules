@@ -26,94 +26,7 @@ class AssetsFolderExtension extends DataExtension
     }
 
     public function updateAssetsFolderCMSField(FieldList $fields) {
-
-        //prepopulating object with asset folder - if allowed
-        if ($this->owner->AssetsFolderID == 0) {
-            $url = $this->owner->assetsFolderUrlToBeWritten();
-
-            if ($url) {
-                //this creates the directory, and attaches it to the page,
-                //as well as saving the object one more time - with the attached folder
-                $this->findOrMakeAssetsFolder($url, false);
-            }
-        }
-
-
-        $dirName = $this->owner->getAssetsFolderDirName();
-        $dirExists = false;
-
-        if ($dirName) {
-            $dirExists = true;
-            //Setting and showing the uploads folder
-            //This doesn't work for iframe uploads, there we need
-            //the AssetsFolderAdmin extension to LeftAndMain
-            Upload::config()->uploads_folder = $dirName;
-
-            //Cookie fallback for moments where it's impossible to figure
-            //out the uploads folder through the leftandmain controller.
-            //e.g. ModelAdmin - {@see AssetsFolderAdmin}
-            Cookie::set('cms-uploaddirrules-uploads-folder', $dirName);
-        }
-
-        //The Upload Directory field
-        //TODO make it configurable if field should be shown
-        //TODO make field placement configurable
-        $field = $this->getAssetsFolderField($dirExists);
-        $fields->removeByName('AssetsFolder');
-
-        //Adding fields - to tab or just pushing
-        $isPage = false;
-        $ancestry = $this->owner->getClassAncestry();
-        foreach ($ancestry as $c) {
-            if ($c == 'SiteTree') {
-                $isPage = true;
-            }
-        }
-
-        if ($dirExists) {
-
-            $field = ToggleCompositeField::create(
-                'UploadDirRulesNotes',
-                'Upload Rules (' . $dirName . ')',
-                [
-                    $field
-                ]
-            );
-
-
-            //configurable tab
-            $tab = $this->owner->config()->uploaddirrules_fieldtab;
-            if (isset($tab)) {
-                $fields->addFieldToTab($tab, $field);
-            } else {
-                if ($isPage) {
-                    //$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
-                    $fields->addFieldToTab('Root.Main', $field);
-                } else {
-                    //TODO this should be configurable
-                    switch ($this->owner->ClassName) {
-                        case 'Subsite':
-                            $fields->addFieldToTab('Root.Configuration', $field);
-                            break;
-
-                        case 'SiteConfig':
-                        case 'GenericContentBlock':
-                            $fields->addFieldToTab('Root.Main', $field);
-                            break;
-
-                        default:
-                            $fields->push($field);
-                    }
-                }
-            }
-        } else {
-            $noteTab = new Tab('Note', 'Note', $field);
-            $fields->insertBefore($noteTab, 'Main');
-        }
-
-
-
-        return $fields;
+        return AssetsFolderCmsFieldsHelper::updateAssetsFolderCMSField($this->owner, $fields);
     }
 
 
@@ -137,7 +50,7 @@ class AssetsFolderExtension extends DataExtension
         }
     }
 
-    //TODO this should NOT be public, but I'm not sure wheteher there's a way around it
+    //TODO this should NOT be public, but I'm not sure whether there's a way around it
     public function assetsFolderUrlToBeWritten() {
         $url = null;
 
@@ -173,7 +86,7 @@ class AssetsFolderExtension extends DataExtension
      *
      * @return Folder|null
      */
-    protected function findOrMakeAssetsFolder($url, $doWrite = true)
+    public function findOrMakeAssetsFolder($url, $doWrite = true)
     {
         $owner = $this->owner;
         $dir = Folder::find_or_make($url);
@@ -214,107 +127,8 @@ class AssetsFolderExtension extends DataExtension
      *
      * @return LiteralField|null
      */
-    protected function getAssetsFolderField($dirExists)
+    public function getAssetsFolderField($dirExists)
     {
-        $field = null;
-        $msg = null;
-
-        if ($dirExists) {
-
-            //Message
-            $defaultMsg = '<em>Files uploaded via the content area will be uploaded to</em>'.
-                '<br /> <strong>'.Upload::config()->uploads_folder.'</strong>';
-            if ($this->owner instanceof UploadDirRulesInterface) {
-                $msg = $this->owner->getMessageUploadDirectory();
-            }
-            if (!$msg) {
-                $msg = $defaultMsg;
-            }
-
-            //TODO these could also be global settings
-            $manageAble = true;
-            $editable = true;
-
-            //As this is happening from the subsites administration, when editing a subsite
-            //you'd probably be on another site, and hence can't access the site's files anyway
-            if ($this->owner->ClassName == 'Subsite') {
-                $manageAble = false;
-                $editable = false;
-            }
-
-            if ($editable) {
-
-                //Asset folder is editable
-
-                $field1 = new TreeDropdownField('AssetsFolderID', 'Change Directory:', 'Folder');
-                $field1->setRightTitle('Directory changes take place after saving.');
-
-                //Dropdown field style adjustments
-                //TODO move this to an external stylesheet as these styles don't kick in on AJAX loads
-                Requirements::customCSS('
-                    #TreeDropdownField_Form_EditForm_AssetsFolderID {
-                        min-width: 260px;
-                    }
-                    .UploadDirectoryFields .fieldgroup label {
-                        padding: 0 0 4px;
-                    }
-                ');
-
-                $dir = $this->owner->AssetsFolder();
-                $filescount = File::get()->filter(array('ParentID' => $dir->ID))->count();
-
-                $manageButton = null;
-                if ($manageAble) {
-                    $manageButton =
-                    "<a href='/admin/assets/show/".$dir->ID."' class='ss-ui-button ss-ui-button-small ui-button'>
-                        Manage Files (".$filescount.')</a>';
-                }
-
-                $field2 = new LiteralField('UploadDirRulesNote',
-                        "<div style='margin-bottom:10px;margin-right:16px;'>$msg</div>".$manageButton);
-
-                $field = new FieldGroup(array(
-                    $field2,
-                    $field1,
-                ));
-
-                $field->setTitle('Upload Directory');
-                $field->addExtraClass('UploadDirectoryFields');
-                $field->setName('UploadDirectoryFields');
-            } else {
-
-                //Asset folder is not editable
-
-                $field = new LiteralField('UploadDirRulesNote', '
-                    <div class="field text" id="UploadDirRulesNote">
-                        <label class="left">Upload Directory</label>
-                        <div class="middleColumn">
-                            <p style="margin-bottom: 0; padding-top: 0px;">
-                                '.$msg.'
-                                <br />
-                                <em>If you need to edit or change this folder, please contact your administrator.</em>
-                            </p>
-                        </div>
-                    </div>
-                    ');
-            }
-        } else {
-
-            //Message
-            $defaultMsg = 'Please <strong>choose a name and save</strong> for adding content.';
-            if ($this->owner instanceof UploadDirRulesInterface) {
-                $msg = $this->owner->getMessageSaveFirst();
-            }
-            if (!$msg) {
-                $msg = $defaultMsg;
-            }
-            //preview calculated assets folder
-            //$msg = $msg . ' (' . $this->owner->getCalcAssetsFolderDirectory() . ')';
-            $field = new LiteralField('UploadDirRulesNote', '
-                <p class="message notice" >'.$msg.'</p>
-            ');
-        }
-
-        return $field;
+        return AssetsFolderCmsFieldsHelper::assetsFolderField($this->owner, $dirExists);
     }
 }
