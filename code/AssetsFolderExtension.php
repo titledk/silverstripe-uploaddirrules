@@ -2,7 +2,7 @@
 /**
  * This extension can be added to any object that should have a relationship
  * to a folder inside /assets.
- * 
+ *
  * @author Anselm Christophersen <ac@title.dk>
  * @copyright Copyright (c) 2015, Title Web Solutions
  */
@@ -15,7 +15,7 @@ class AssetsFolderExtension extends DataExtension
     /**
      * Displaying assets folder relation in CMS fields
      * as well as setting the global upload config.
-     * 
+     *
      * @param FieldList $fields
      *
      * @return FieldList|void
@@ -28,7 +28,7 @@ class AssetsFolderExtension extends DataExtension
         if ($dirName) {
             $dirExists = true;
             //Setting and showing the uploads folder
-            //This doesn't work for iframe uploads, there we need 
+            //This doesn't work for iframe uploads, there we need
             //the AssetsFolderAdmin extension to LeftAndMain
             Upload::config()->uploads_folder = $dirName;
 
@@ -124,7 +124,7 @@ class AssetsFolderExtension extends DataExtension
     /**
      * Find or make assets folder
      * called from onBeforeWrite.
-     * 
+     *
      * @param string $url
      * @param bool   $doWrite
      *
@@ -140,7 +140,7 @@ class AssetsFolderExtension extends DataExtension
         }
 
         //Special case for when creating a new subsite
-        //the directory will need to be associated with the subsite 
+        //the directory will need to be associated with the subsite
         if ($owner->ClassName == 'Subsite') {
             $dir->SubsiteID = $owner->ID;
             $dir->write();
@@ -166,7 +166,7 @@ class AssetsFolderExtension extends DataExtension
 
     /**
      * Upload Dir Rules message and fields to display in the CMS.
-     * 
+     *
      * @param bool $dirExists
      *
      * @return LiteralField|null
@@ -215,13 +215,13 @@ class AssetsFolderExtension extends DataExtension
                 //Dropdown field style adjustments
                 //TODO move this to an external stylesheet as these styles don't kick in on AJAX loads
                 Requirements::customCSS('
-					#TreeDropdownField_Form_EditForm_AssetsFolderID {
-						min-width: 260px;
-					}
-					.UploadDirectoryFields .fieldgroup label {
-						padding: 0 0 4px;
-					}
-				');
+                    #TreeDropdownField_Form_EditForm_AssetsFolderID {
+                        min-width: 260px;
+                    }
+                    .UploadDirectoryFields .fieldgroup label {
+                        padding: 0 0 4px;
+                    }
+                ');
 
                 $dir = $this->owner->AssetsFolder();
                 $filescount = File::get()->filter(array('ParentID' => $dir->ID))->count();
@@ -230,7 +230,7 @@ class AssetsFolderExtension extends DataExtension
                 if ($manageAble) {
                     $manageButton =
                     "<a href='/admin/assets/show/".$dir->ID."' class='ss-ui-button ss-ui-button-small ui-button'>
-						Manage Files (".$filescount.')</a>';
+                        Manage Files (".$filescount.')</a>';
                 }
 
                 $field2 = new LiteralField('UploadDirRulesNote',
@@ -249,17 +249,17 @@ class AssetsFolderExtension extends DataExtension
                 //Asset folder is not editable
 
                 $field = new LiteralField('UploadDirRulesNote', '
-					<div class="field text" id="UploadDirRulesNote">
-						<label class="left">Upload Directory</label>
-						<div class="middleColumn">
-							<p style="margin-bottom: 0; padding-top: 0px;">
-								'.$msg.'
-								<br />
-								<em>If you need to edit or change this folder, please contact your administrator.</em>
-							</p>
-						</div>
-					</div>
-					');
+                    <div class="field text" id="UploadDirRulesNote">
+                        <label class="left">Upload Directory</label>
+                        <div class="middleColumn">
+                            <p style="margin-bottom: 0; padding-top: 0px;">
+                                '.$msg.'
+                                <br />
+                                <em>If you need to edit or change this folder, please contact your administrator.</em>
+                            </p>
+                        </div>
+                    </div>
+                    ');
             }
         } else {
 
@@ -272,8 +272,8 @@ class AssetsFolderExtension extends DataExtension
                 $msg = $defaultMsg;
             }
             $field = new LiteralField('UploadDirRulesNote', '
-				<p class="message notice" >'.$msg.'</p>
-			');
+                <p class="message notice" >'.$msg.'</p>
+            ');
         }
 
         return $field;
