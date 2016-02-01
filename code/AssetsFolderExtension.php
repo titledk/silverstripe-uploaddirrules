@@ -22,6 +22,23 @@ class AssetsFolderExtension extends DataExtension
      */
     public function updateCMSFields(FieldList $fields)
     {
+        return $this->owner->updateAssetsFolderCMSField($fields);
+    }
+
+    public function updateAssetsFolderCMSField(FieldList $fields) {
+
+        //prepopulating object with asset folder - if allowed
+        if ($this->owner->AssetsFolderID == 0) {
+            $url = $this->owner->assetsFolderUrlToBeWritten();
+
+            if ($url) {
+                //this creates the directory, and attaches it to the page,
+                //as well as saving the object one more time - with the attached folder
+                $this->findOrMakeAssetsFolder($url, false);
+            }
+        }
+
+
         $dirName = $this->owner->getAssetsFolderDirName();
         $dirExists = false;
 
@@ -42,6 +59,7 @@ class AssetsFolderExtension extends DataExtension
         //TODO make it configurable if field should be shown
         //TODO make field placement configurable
         $field = $this->getAssetsFolderField($dirExists);
+        $fields->removeByName('AssetsFolder');
 
         //Adding fields - to tab or just pushing
         $isPage = false;
@@ -52,33 +70,52 @@ class AssetsFolderExtension extends DataExtension
             }
         }
 
-        //configurable tab
-        $tab = $this->owner->config()->uploaddirrules_fieldtab;
-        if (isset($tab)) {
-            $fields->addFieldToTab($tab, $field);
-        } else {
-            if ($isPage) {
-                //$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
-                $fields->addFieldToTab('Root.Main', $field);
+        if ($dirExists) {
+
+            $field = ToggleCompositeField::create(
+                'UploadDirRulesNotes',
+                'Upload Rules (' . $dirName . ')',
+                [
+                    $field
+                ]
+            );
+
+
+            //configurable tab
+            $tab = $this->owner->config()->uploaddirrules_fieldtab;
+            if (isset($tab)) {
+                $fields->addFieldToTab($tab, $field);
             } else {
-                switch ($this->owner->ClassName) {
+                if ($isPage) {
+                    //$fields->addFieldToTab('Root.Main', $htmlField, 'Content');
+                    $fields->addFieldToTab('Root.Main', $field);
+                } else {
+                    //TODO this should be configurable
+                    switch ($this->owner->ClassName) {
+                        case 'Subsite':
+                            $fields->addFieldToTab('Root.Configuration', $field);
+                            break;
 
-                    case 'Subsite':
-                        $fields->addFieldToTab('Root.Configuration', $field);
-                        break;
+                        case 'SiteConfig':
+                        case 'GenericContentBlock':
+                            $fields->addFieldToTab('Root.Main', $field);
+                            break;
 
-                    case 'SiteConfig':
-                        $fields->addFieldToTab('Root.Main', $field);
-                        break;
-
-                    default:
-                        $fields->push($field);
+                        default:
+                            $fields->push($field);
+                    }
                 }
             }
+        } else {
+            $noteTab = new Tab('Note', 'Note', $field);
+            $fields->insertBefore($noteTab, 'Main');
         }
+
+
 
         return $fields;
     }
+
 
     /**
      * Creation and association of assets folder,
@@ -90,28 +127,7 @@ class AssetsFolderExtension extends DataExtension
 
         //creation will only be considered if the object has no folder relation
         if ($this->owner->AssetsFolderID == 0) {
-
-            //the default rules only require the object to have an ID
-            //but more sophisticated rules might require more - e.g. a title to be set
-            //thus we check if the object is ready for folder creation - if custom rules
-            //(UploadDirRulesInterface) have been set
-            if ($this->owner instanceof UploadDirRulesInterface) {
-                if (!$this->owner->getReadyForFolderCreation()) {
-                    return false;
-                }
-            }
-
-            $url = null;
-            //check if the page we're having is implementing the UploadDirRulesInterface
-            //for rule customization
-            if ($this->owner instanceof UploadDirRulesInterface) {
-                $url = $this->owner->getCalcAssetsFolderDirectory();
-            } else {
-                //else use the default settings
-
-                $class = UploadDirRules::get_rules_class();
-                $url = $class::calc_full_directory_for_object($this->owner);
-            }
+            $url = $this->owner->assetsFolderUrlToBeWritten();
 
             if ($url) {
                 //this creates the directory, and attaches it to the page,
@@ -119,6 +135,33 @@ class AssetsFolderExtension extends DataExtension
                 $this->findOrMakeAssetsFolder($url, true);
             }
         }
+    }
+
+    //TODO this should NOT be public, but I'm not sure wheteher there's a way around it
+    public function assetsFolderUrlToBeWritten() {
+        $url = null;
+
+        //the default rules only require the object to have an ID
+        //but more sophisticated rules might require more - e.g. a title to be set
+        //thus we check if the object is ready for folder creation - if custom rules
+        //(UploadDirRulesInterface) have been set
+        if ($this->owner instanceof UploadDirRulesInterface) {
+            if (!$this->owner->getReadyForFolderCreation()) {
+                return false;
+            }
+        }
+
+        //check if the page we're having is implementing the UploadDirRulesInterface
+        //for rule customization
+        if ($this->owner instanceof UploadDirRulesInterface) {
+            $url = $this->owner->getCalcAssetsFolderDirectory();
+        } else {
+            //else use the default settings
+
+            $class = UploadDirRules::get_rules_class();
+            $url = $class::calc_full_directory_for_object($this->owner);
+        }
+        return $url;
     }
 
     /**
@@ -171,16 +214,10 @@ class AssetsFolderExtension extends DataExtension
      *
      * @return LiteralField|null
      */
-    protected function getAssetsFolderField()
+    protected function getAssetsFolderField($dirExists)
     {
         $field = null;
         $msg = null;
-
-        $dirName = $this->owner->getAssetsFolderDirName();
-        $dirExists = false;
-        if ($dirName) {
-            $dirExists = true;
-        }
 
         if ($dirExists) {
 
@@ -271,6 +308,8 @@ class AssetsFolderExtension extends DataExtension
             if (!$msg) {
                 $msg = $defaultMsg;
             }
+            //preview calculated assets folder
+            //$msg = $msg . ' (' . $this->owner->getCalcAssetsFolderDirectory() . ')';
             $field = new LiteralField('UploadDirRulesNote', '
                 <p class="message notice" >'.$msg.'</p>
             ');
