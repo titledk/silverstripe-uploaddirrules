@@ -5,7 +5,7 @@ _by title.dk/Anselm Christophersen_
 Rules and utilities to keep the SilverStripe assets directory tidy.
 
 By installing this module and adding extensions to the objects you want affected,
-these objects will receive an associated folder inside of assets.    
+these objects will receive an associated folder inside of assets.
 Now instead of bluntly uploading everything to `assets/Uploads` your site will
 upload files more controlled - defaults are set, which are easy to override.
 
@@ -15,9 +15,9 @@ allows for sophisticated files & assets strategies.
 ![Administration](docs/img/admin.png)
 
 
-**Upload rules are enforced both when uploading through an upload field, but also 
-when uploading through the text editor**    
-_(thanks to the `AssetsFolderAdmin` extension)_  
+**Upload rules are enforced both when uploading through an upload field, but also
+when uploading through the text editor**
+_(thanks to the `AssetsFolderAdmin` extension)_
 
 This is especially helpful when working with [Subsites](https://github.com/silverstripe/silverstripe-subsites/)
 (we're specifically catering for those with `SubsitesUploadDirRules`), but also helpful
@@ -46,16 +46,38 @@ a downloads page, or anything else where you wont' want your files scattered all
 
 The basic rules are defined in `UploadDirRules::calc_base_directory_for_object()`, basically
 putting all files related to `DataObject` into a `dataobjects` folder, everything related to
-`SiteTree` into a `pages` folder and everything related to `SiteConfig` into a `site` folder. 
+`SiteTree` into a `pages` folder and everything related to `SiteConfig` into a `site` folder.
 
 
 
 ## Overriding default upload dir rules
 
-Just implement the `UploadDirRulesInterface`.    
+Just implement the `UploadDirRulesInterface`.
 Customization through SilverStripe's config is planned, send a pull request if you need it!
 
 Rules can be anything, from just being a common folder to containing id and or title.
+
+### Example
+
+    /**
+     * Images related to the portfolio page should just be saved under "portfolio"
+     * @return string
+     */
+    function getCalcAssetsFolderDirectory() {
+        if ($this->ID) {
+            $url = "portfolio";
+            return $url;
+        }
+    }
+    function getMessageSaveFirst(){
+        return 'You will be able to add images once you save for the first time.';
+    }
+    function getMessageUploadDirectory() {
+        return null;
+    }
+    function getReadyForFolderCreation() {
+        return true;
+    }
 
 
 ## Planned enhancements
