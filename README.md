@@ -60,25 +60,25 @@ Rules can be anything, from just being a common folder to containing id and or t
 ### Example
 
 ```php
-/**
- * Images related to the portfolio page should just be saved under "portfolio"
- * @return string
- */
+// Create directory based on the page name
 function getCalcAssetsFolderDirectory() {
     if ($this->ID) {
-        $url = "portfolio";
-        return $url;
+        $filter = URLSegmentFilter::create();
+        return $filter->filter($this->Title);
     }
 }
 function getMessageSaveFirst(){
-    return 'You will be able to add images once you save for the first time.';
+    return 'Please pick a name and save to create corresponding directory';
 }
 function getMessageUploadDirectory() {
     return null;
 }
+// Make sure that the directory is NOT saved before a page name has been chosen
 function getReadyForFolderCreation() {
-    return true;
+    if ($this->Title != 'New ' . self::$singular_name) {
+        return true;
     }
+}
 ```
 
 ## Planned enhancements
