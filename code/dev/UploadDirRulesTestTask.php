@@ -1,7 +1,7 @@
 <?php
 /**
  * Test task for helping upload dir rules development and debugging.
- * 
+ *
  * @author Anselm Christophersen <ac@title.dk>
  * @copyright Copyright (c) 2015, Title Web Solutions
  */

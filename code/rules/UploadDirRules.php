@@ -1,7 +1,7 @@
 <?php
 /**
  * Helper for consistent upload directories.
- * 
+ *
  * @author Anselm Christophersen <ac@title.dk>
  * @copyright Copyright (c) 2015, Title Web Solutions
  */
@@ -10,7 +10,7 @@ class UploadDirRules
     /**
      * Global rules for asset directories
      * These can be overridden on each class.
-     * 
+     *
      * @param DataObject $do
      *
      * @return string
@@ -24,7 +24,7 @@ class UploadDirRules
 
     /**
      * Base rules.
-     * 
+     *
      * @param DataObject $do
      *
      * @return string
