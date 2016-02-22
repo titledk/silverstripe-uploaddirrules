@@ -10,7 +10,7 @@ class SubsiteUploadDirRules extends UploadDirRules
     /**
      * Base rules for subsite directory
      * TODO make it configurable, allowing for subsite dirs to be either in the root, or inside of a "subsites" directory.
-     * 
+     *
      * @return bool|string
      */
     public static function calc_directory_for_subsite($subsite)
@@ -28,7 +28,7 @@ class SubsiteUploadDirRules extends UploadDirRules
 
     /**
      * Getting subsite directory based on it's assets folder.
-     * 
+     *
      * @return bool|mixed
      */
     public static function get_directory_for_current_subsite()
@@ -61,7 +61,7 @@ class SubsiteUploadDirRules extends UploadDirRules
 
     /**
      * Full subsite directory.
-     * 
+     *
      * @param DataObject $do
      *
      * @return bool|string

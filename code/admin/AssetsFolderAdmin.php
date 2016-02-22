@@ -1,7 +1,7 @@
 <?php
 /**
  * Extension for {@see LeftAndMainExtension}.
- * 
+ *
  * @author Anselm Christophersen <ac@title.dk>
  * @copyright Copyright (c) 2015, Title Web Solutions
  */
