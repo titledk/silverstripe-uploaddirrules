@@ -1,16 +1,29 @@
 {
-  "name": "titledk/silverstripe-uploaddirrules",
-  "description": "Rules and utilities to keep the SilverStripe assets directory tidy",
-  "type": "silverstripe-module",
-  "homepage": "https://github.com/titledk/silverstripe-uploaddirrules",
-  "keywords": ["silverstripe", "assets", "subsites"],
-  "authors": [
-    {"name": "Anselm Christophersen","email": "ac@anselm.dk"}
-  ],
-  "extra": {
-    "installer-name": "uploaddirrules",
-    "screenshots": [
-      "docs/img/admin.png"
-    ]
-  }
+    "name": "titledk/silverstripe-uploaddirrules",
+    "description": "Rules and utilities to keep the SilverStripe assets directory tidy",
+    "type": "silverstripe-module",
+    "homepage": "https://github.com/titledk/silverstripe-uploaddirrules",
+    "keywords": [
+        "silverstripe",
+        "assets",
+        "subsites"
+    ],
+    "authors": [
+        {
+            "name": "Anselm Christophersen",
+            "email": "ac@anselm.dk"
+        }
+    ],
+    "extra": {
+        "installer-name": "uploaddirrules",
+        "screenshots": [
+            "docs/img/admin.png"
+        ]
+    },
+    "require": {
+        "silverstripe/framework": "^3.1"
+    },
+    "support": {
+        "issues": "https://github.com/titledk/silverstripe-uploaddirrules/issues"
+    }
 }
