@@ -45,6 +45,9 @@ class AssetsFolderCmsFieldsHelper {
                 //Dropdown field style adjustments
                 //TODO move this to an external stylesheet as these styles don't kick in on AJAX loads
                 Requirements::customCSS('
+                    #Form_EditForm_UploadDirRulesNotes .ui-accordion-content {
+                        overflow: visible;
+                    }
                     #TreeDropdownField_Form_EditForm_AssetsFolderID {
                         min-width: 260px;
                     }
