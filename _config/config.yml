@@ -1,0 +1,27 @@
+---
+Name: uploaddirrules
+---
+LeftAndMain:
+  extensions:
+    - AssetsFolderAdmin
+---
+Only:
+  classexists: 'SiteTree'
+---
+SiteTree:
+  extensions:
+    - AssetsFolderExtension
+---
+Only:
+  classexists: 'SiteConfig'
+---
+SiteConfig:
+  extensions:
+    - AssetsFolderExtension
+---
+Only:
+  classexists: 'Subsite'
+---
+Subsite:
+  extensions:
+    - AssetsFolderExtension

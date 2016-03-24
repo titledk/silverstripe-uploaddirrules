@@ -25,22 +25,6 @@ in general, or when needing a basic [gallery](https://github.com/titledk/silvers
 a downloads page, or anything else where you wont' want your files scattered all over the place.
 
 
-## Configuration example
-
-    SiteTree:
-      extensions:
-        - AssetsFolderExtension
-    SiteConfig:
-      extensions:
-        - AssetsFolderExtension
-    Subsite:
-      extensions:
-        - AssetsFolderExtension
-    LeftAndMain:
-      extensions:
-        - AssetsFolderAdmin
-
-
 
 ## Basic rules
 
