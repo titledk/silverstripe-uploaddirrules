@@ -147,13 +147,15 @@ class AssetsFolderCmsFieldsHelper {
             //Cookie fallback for moments where it's impossible to figure
             //out the uploads folder through the leftandmain controller.
             //e.g. ModelAdmin - {@see AssetsFolderAdmin}
-            Cookie::set('cms-uploaddirrules-uploads-folder', $dirName);
+            if (Cookie::get('cms-uploaddirrules-uploads-folder') != $dirName) {
+                Cookie::set('cms-uploaddirrules-uploads-folder', $dirName);
+            }
         }
 
         //The Upload Directory field
         //TODO make it configurable if field should be shown
         //TODO make field placement configurable
-        $field = $obj->getAssetsFolderField($dirExists);
+        $field = AssetsFolderCmsFieldsHelper::assetsFolderField($obj, $dirExists);
         $fields->removeByName('AssetsFolder');
 
         //Adding fields - to tab or just pushing
@@ -197,7 +199,11 @@ class AssetsFolderCmsFieldsHelper {
                             break;
 
                         default:
-                            $fields->push($field);
+                            if ($fields->fieldByName('Root.Main')) {
+                                $fields->addFieldToTab('Root.Main', $field);
+                            } else {
+                                $fields->push($field);
+                            }
                     }
                 }
             }
