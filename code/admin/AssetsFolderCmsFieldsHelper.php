@@ -17,7 +17,7 @@ class AssetsFolderCmsFieldsHelper {
             //Message
             $defaultMsg = '<em>Files uploaded via the content area will be uploaded to</em>'.
                 '<br /> <strong>'.Upload::config()->uploads_folder.'</strong>';
-            if ($obj instanceof UploadDirRulesInterface) {
+            if (method_exists($obj, 'getMessageUploadDirectory')) {
                 $msg = $obj->getMessageUploadDirectory();
             }
             if (!$msg) {
@@ -98,7 +98,7 @@ class AssetsFolderCmsFieldsHelper {
 
             //Message
             $defaultMsg = 'Please <strong>choose a name and save</strong> for adding content.';
-            if ($obj instanceof UploadDirRulesInterface) {
+            if (method_exists($obj, 'getMessageSaveFirst')) {
                 $msg = $obj->getMessageSaveFirst();
             }
             if (!$msg) {

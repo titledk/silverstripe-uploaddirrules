@@ -58,7 +58,7 @@ class AssetsFolderExtension extends DataExtension
         //but more sophisticated rules might require more - e.g. a title to be set
         //thus we check if the object is ready for folder creation - if custom rules
         //(UploadDirRulesInterface) have been set
-        if ($this->owner instanceof UploadDirRulesInterface) {
+        if (method_exists($this->owner, 'getReadyForFolderCreation')) {
             if (!$this->owner->getReadyForFolderCreation()) {
                 return false;
             }
